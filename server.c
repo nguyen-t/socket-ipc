@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 
 #define BUFFER_SIZE 1024
+#define SOCKET_PATH "./endpoint"
 
 void* task(void* socket) {
   int fd = *(int *) socket;
@@ -22,6 +23,8 @@ void* task(void* socket) {
   snprintf(wr_buffer, BUFFER_SIZE, "Connection confirmed\n");
   send(fd, wr_buffer, BUFFER_SIZE, 0);
 
+  // IO handling
+  // Doesn't actually do much right now
   do {
     memset(rd_buffer, 0, sizeof(rd_buffer));
     memset(wr_buffer, 0, sizeof(wr_buffer));
@@ -36,6 +39,7 @@ void* task(void* socket) {
 
   } while(strcmp(rd_buffer, "exit") != 0);
 
+  // Terminates threads and socket
   printf("Thread %ld finished.\n", pthread_self());
   shutdown(fd, SHUT_RDWR);
   pthread_exit(0);
@@ -51,10 +55,12 @@ int main(int argc, char** argv) {
   struct sockaddr_un* s_add = calloc(1, sizeof(struct sockaddr_un));
   struct sockaddr_un* c_add = calloc(1, sizeof(struct sockaddr_un));
 
+  // Setup socket server
+
   s_len = sizeof(*s_add);
   c_len = sizeof(*c_add);
   s_add->sun_family = AF_UNIX;
-  sprintf(s_add->sun_path, "./endpoint");
+  sprintf(s_add->sun_path, SOCKET_PATH);
   unlink(s_add->sun_path);
 
   if((s_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
@@ -75,6 +81,9 @@ int main(int argc, char** argv) {
   } else {
     printf("Socket listen: passed\n");
   }
+
+  // Terminating condition undecided
+  // Handles connections
   for(u_int32_t i = 0; 1; i++) {
     if((c_fd = accept(s_fd, (struct sockaddr*) c_add, &c_len)) == -1) {
       printf("Socket accept: failed\n");
@@ -90,6 +99,7 @@ int main(int argc, char** argv) {
     }
   }
 
+  // Ends
   shutdown(s_fd, SHUT_RDWR);
   return 0;
 }
