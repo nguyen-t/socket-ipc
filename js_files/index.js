@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { Socket } = require('net');
 
-const SOCKET_PATH = './endpoint';
+const SOCKET_PATH = '../bin/endpoint';
 
 let unix = new Socket({
    "allowHalfOpen": true

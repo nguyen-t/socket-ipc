@@ -9,26 +9,27 @@
 #include <sys/socket.h>
 
 #define BUFFER_SIZE 1024
-#define SOCKET_PATH "./endpoint"
+#define SOCKET_PATH "./bin/endpoint"
 
 void* task(void* socket) {
   int fd = *(int *) socket;
   char rd_buffer[BUFFER_SIZE];
   char wr_buffer[BUFFER_SIZE];
 
+  fcntl(fd, F_SETFL, O_NONBLOCK);
   memset(rd_buffer, 0, sizeof(rd_buffer));
   memset(wr_buffer, 0, sizeof(wr_buffer));
-
-  fcntl(fd, F_SETFL, O_NONBLOCK);
   snprintf(wr_buffer, BUFFER_SIZE, "Connection confirmed\n");
-  send(fd, wr_buffer, BUFFER_SIZE, 0);
 
   // IO handling
   // Doesn't actually do much right now
   do {
-    memset(rd_buffer, 0, sizeof(rd_buffer));
-    memset(wr_buffer, 0, sizeof(wr_buffer));
-
+    if(strcmp(rd_buffer, "") != 0) {
+      memset(rd_buffer, 0, sizeof(rd_buffer));
+    }
+    if(strcmp(wr_buffer, "") != 0) {
+      memset(wr_buffer, 0, sizeof(wr_buffer));
+    }
     if(recv(fd, rd_buffer, BUFFER_SIZE, 0) != -1) {
       printf("%d sent: <%s>\n", fd, rd_buffer);
       snprintf(wr_buffer, BUFFER_SIZE, "Recieved: %s", rd_buffer);
@@ -36,7 +37,6 @@ void* task(void* socket) {
     if(strcmp(wr_buffer, "") != 0) {
       send(fd, wr_buffer, BUFFER_SIZE, 0);
     }
-
   } while(strcmp(rd_buffer, "exit") != 0);
 
   // Terminates threads and socket
@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
   struct sockaddr_un* c_add = calloc(1, sizeof(struct sockaddr_un));
 
   // Setup socket server
-
   s_len = sizeof(*s_add);
   c_len = sizeof(*c_add);
   s_add->sun_family = AF_UNIX;

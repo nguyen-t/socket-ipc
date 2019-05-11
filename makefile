@@ -1,8 +1,16 @@
-all: server.o
-	gcc server.o -o server -lpthread -O2
+BIN = ./bin
+JSFILES = ./js_files
+CFILES = ./c_files
+CFLAGS = -lpthread -O2
 
-server.o: server.c
-	gcc -c server.c
+all: $(CFILES)/server.c
+	gcc $(CFILES)/server.c -o $(BIN)/server $(CFLAGS)
+
+run:
+	$(BIN)/server
+
+node:
+	node $(JSFILES)
 
 clean:
-	rm -r server.o server
+	rm -r $(BIN)/*
