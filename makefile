@@ -7,7 +7,7 @@ all: $(CFILES)/server.c
 	gcc $(CFILES)/server.c -o $(BIN)/server $(CFLAGS)
 
 run:
-	$(BIN)/server
+	$(BIN)/server &
 
 node:
 	node $(JSFILES)

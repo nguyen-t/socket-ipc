@@ -1,7 +1,7 @@
 const readline = require('readline');
 const { Socket } = require('net');
 
-const SOCKET_PATH = '../bin/endpoint';
+const SOCKET_PATH = './bin/endpoint';
 
 let unix = new Socket({
    "allowHalfOpen": true
@@ -26,6 +26,7 @@ unix.connect(SOCKET_PATH);
 unix.on('connect', async () => {
   console.log('Connection established');
   unix.setEncoding('utf-8');
+  unix.write('Hello from NodeJS!');
 });
 unix.on('data', async (data) => {
   console.log(data);

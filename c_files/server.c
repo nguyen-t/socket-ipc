@@ -42,7 +42,8 @@ void* task(void* socket) {
   // Terminates threads and socket
   printf("Thread %ld finished.\n", pthread_self());
   shutdown(fd, SHUT_RDWR);
-  pthread_exit(0);
+
+  return NULL;
 }
 
 int main(int argc, char** argv) {
